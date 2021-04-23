@@ -21,6 +21,9 @@ all_file = 'output_all.csv'
 out_file = 'output_corner.pdf'  # writeout file for the corner plots
 out_file2 = 'output_dtct_lims.pdf' # writeout file for the detection limit plots
 out_file3 = 'output_srv.pdf' # writeout file for the survivor plots
+# Other
+n = 5000000  # number of companions generated in run
+mass = 1.01  # target mass in solar masses
 
 # Convenience functions
 def jup_mass_to_sol(jupiter_mass):
@@ -460,3 +463,8 @@ def survivor(survivors_file, all_file, param, file_out=None):
       plt.savefig(file_out, bbox_inches='tight', pad_inches=0.2)
   plt.show()
   return
+
+# Comment and uncomment as needed
+# corner(survivors_file,  n_gen=n, given_params='all', smoothing=True, file_out=out_file)
+# detection_limits(survivors_file, mass, file_out=out_file2
+# survivor(survivors_file, all_file, param='P', file_out=out_file3)
