@@ -1,3 +1,5 @@
+# MOLUSC v.20210423
+# Mackenna Wood, UNC Chapel Hill
 import numpy as np
 import scipy as scipy
 import scipy.stats as stats
@@ -14,76 +16,11 @@ import multiprocessing as mp
 import sys
 import argparse
 import gc
-import matplotlib.pyplot as plt  # TESTING
-
 import warnings
 from astropy.utils.exceptions import AstropyWarning
 warnings.simplefilter('error', category=RuntimeWarning)
 warnings.simplefilter('ignore', category=AstropyWarning)
 warnings.simplefilter('ignore', category=scipy.linalg.misc.LinAlgWarning)
-
-from matplotlib import rcParams
-# Plotting Parameters
-rcParams['font.family'] = 'serif'
-rcParams['font.serif'] = 'Georgia'
-rcParams['font.weight'] = 'bold'
-rcParams['axes.labelweight'] = 'bold'
-rcParams['axes.linewidth'] = 2
-
-
-def binned_value(true_value, dictionary, lower_limit='Inf', upper_limit='Inf'):
-    # Takes a value and a dictionary and finds the dictionary key closest to the true value
-    # lower_limit:
-    # The input lower_limit determines how it handles values smaller than the dictionary's minimum value key
-    # Options:
-    #   'Inf' - all values smaller than the minimum key are given the minimum key
-    #   'Min' - values smaller than the minimum key return an error
-    #   'Zero' - values from zero to the minimum key are given the minimum key, values below zero return an error
-    # upper_limit:
-    # The input upper_limit determines how it handles values larger than the dictionary's maximum value key
-    # Options:
-    #   'Inf' - all values larger than the maximum key are given the maximum key
-    #   'Max' - values larger than the maximum key return an error
-    # Output: The key in the dictionary closest to the true value
-
-    keys = sorted(list(dictionary.keys()))
-    nearest_key = None
-
-    bin_limits = [0.] * len(keys)  # initializes bin limits to be all zeros
-    for i in range(1, len(keys)):
-        bin_limits[i] = round((keys[i - 1] + keys[i]) / 2, 4)
-
-    # First Bin
-    if lower_limit == 'Inf':
-        bin_limits[0] = float('-inf')
-    elif lower_limit == 'Zero':
-        bin_limits[0] = 0.
-    elif lower_limit == 'Min':
-        bin_limits[0] = keys[0]
-    else:
-        print("Error: Unrecognized input lower_limit")
-        return SyntaxError
-    # Last Bin
-    if upper_limit == 'Max':
-        bin_limits.append(keys[-1])
-    elif upper_limit == 'Inf':
-        bin_limits.append(float('inf'))
-    else:
-        print('Error: Unrecognized input upper_limit')
-        return SyntaxError
-
-    for k in range(0, len(bin_limits)-1):
-        if bin_limits[k] <= true_value < bin_limits[k + 1]:
-            nearest_key = keys[k]
-
-    if nearest_key is None:
-        print('Unable to find nearest key')
-        print('True Value', true_value)
-        print('Dictionary:', dictionary)
-        print('Bin Limits:', bin_limits)
-        return KeyError
-
-    return nearest_key
 
 # Parallel Functions
 def calculate_RV_parallel(period, mass_ratio, a, e, cos_i, arg_peri, phase, MJD, calc):
@@ -182,7 +119,7 @@ class GUI(tk.Frame):
         self.__ruwe_check = tk.BooleanVar()
         self.__gaia_check = tk.BooleanVar()
 
-        ao_box = tk.Checkbutton(checkbox_frame, text="AO", variable=self.__ao_check, command=self.activate_ao, bg='#ECECEC')
+        ao_box = tk.Checkbutton(checkbox_frame, text="HRI", variable=self.__ao_check, command=self.activate_ao, bg='#ECECEC')
         rv_box = tk.Checkbutton(checkbox_frame, text="RV", variable=self.__rv_check, command=self.activate_rv, bg='#ECECEC')
         jitter_box = tk.Checkbutton(checkbox_frame, text='Jitter', variable=self.__jitter_check,command=self.activate_jitter, bg='#ECECEC')
         ruwe_box = tk.Checkbutton(checkbox_frame, text='RUWE', variable=self.__ruwe_check, bg='#ECECEC')
@@ -198,7 +135,7 @@ class GUI(tk.Frame):
         # label column
         rv_label = tk.Label(Analysis_Options, text='RV File Name:', bg='#ECECEC')
         jitter_label = tk.Label(Analysis_Options, text='Stellar Jitter (m/s):', bg='#ECECEC')
-        ao_label = tk.Label(self.ao_frame, text='AO File Name:', bg='#ECECEC')
+        ao_label = tk.Label(self.ao_frame, text='Contrast File Name:', bg='#ECECEC')
         # entry column
         self.__ao_file = tk.StringVar()
         self.__rv_file = tk.StringVar()
@@ -209,7 +146,7 @@ class GUI(tk.Frame):
         self.__jitter_entry_box = tk.Entry(Analysis_Options, textvariable=self.__jitter_str, state=tk.DISABLED, width=25, disabledbackground='#ECECEC', highlightthickness=0, bd=1)
         # AO filter menu
         self.__filter_str = tk.StringVar()
-        self.__filter_menu = tk.OptionMenu(self.ao_frame, self.__filter_str, 'Filter', 'J', 'H', 'K', 'G', 'R', 'I')
+        self.__filter_menu = tk.OptionMenu(self.ao_frame, self.__filter_str, 'Filter', 'J', 'H', 'K', 'G','Bp','Rp', 'R', 'I')
         self.__filter_str.set('Filter')
         self.__filter_menu.config(state=tk.DISABLED, highlightthickness=0)
         self.ao_filter_menus.append(self.__filter_str)
@@ -560,7 +497,7 @@ class GUI(tk.Frame):
         # Create Widgits
         label = tk.Label(self.ao_frame, text='AO File Name:', bg='#ECECEC')
         file_box = tk.Entry(self.ao_frame, textvariable=ao_file, width=25, highlightthickness=0, bd=1)
-        filter_menu = tk.OptionMenu(self.ao_frame, filter_str, 'Filter', 'J', 'H', 'K', 'G', 'R', 'I')
+        filter_menu = tk.OptionMenu(self.ao_frame, filter_str, 'Filter', 'J', 'H', 'K', 'G', 'Bp', 'Rp', 'R', 'I')
         filter_str.set('Filter')
         # Place Widgets
         label.grid(column=0, row=self.ao_rows)
@@ -1747,16 +1684,12 @@ class Application:
             else:
                 cols = cols + ['Projected Separation(AU)','DeltaG','Predicted RUWE']
                 keep_table = np.vstack((keep_table, np.array(ruwe.projected_sep)[keep], np.array(ruwe.delta_g)[keep], np.array(ruwe.predicted_ruwe)[keep]))
-        # if self.rv_filename:
-        #     # Write out RV calculations
-        #     if self.star_jitter == -1:
-        #         # RV only, no jitter
-        #         cols = cols + ['rv'+str(i) for i in range(0, len(rv.MJD))]
-        #         keep_table = np.vstack((keep_table, np.transpose(np.array(rv.predicted_RV)[keep])))
-        #     else:
-        #         # write out RV and jitter
-        #         cols = cols + ['jitter'] + ['rv' + str(i) for i in range(0, len(rv.MJD))]
-        #         keep_table = np.vstack((keep_table,rv.jitter[keep], np.transpose(np.array(rv.predicted_RV)[keep])))
+        if self.rv_filename:
+            # # Write out RV calculations, makes v. large files
+            # cols = cols + ['rv'+str(i) for i in range(0, len(rv.MJD))]
+            # keep_table = np.vstack((keep_table, np.transpose(np.array(rv.predicted_RV)[keep])))
+            cols = cols + ['RV Amplitude','Binary Type']
+            keep_table = np.vstack((keep_table, np.array(rv.amp)[keep], np.array(rv.b_type)[keep]))
         keep_table = np.transpose(keep_table)
         ascii.write(keep_table, (self.prefix + "_kept.csv"), format='csv', names=cols, overwrite=True)
         self.print_out(('Surviving binary parameters saved to: ' + self.prefix + '_kept.csv'))
@@ -1771,8 +1704,8 @@ class Application:
             if self.rv_filename:
                 # Write out RV calculations
                 if self.star_jitter == -1:  # RV only, no jitter
-                    cols = cols + ['RV Rejected']
-                    all_table = np.vstack((all_table, self.rv_reject_list))
+                    cols = cols + ['RV Amplitude','Binary Type','RV Rejected']
+                    all_table = np.vstack((all_table, rv.amp, rv.b_type, self.rv_reject_list))
                     # Uncomment to  include RV Calcualations in output file (makes it obnoxiously large)
                     # cols = cols + ['rv' + str(i) for i in range(0, len(rv.MJD))]
                     # all_table = np.vstack((all_table, np.transpose(np.array(rv.predicted_RV))))
@@ -2437,7 +2370,6 @@ class AO:
     # Input file must be in mas and mags
 
     def __init__(self, filename, companions, star_mass, star_age, star_ra, star_dec, filter, gaia=False):
-        # self.parent = parent
         self.ao_filename = filename
         self.mass_ratio = companions.get_mass_ratio()
         self.a = companions.get_a()
@@ -2447,7 +2379,6 @@ class AO:
         self.age_model = self.load_stellar_model(filter, star_age)
         if gaia:
             self.a_type = 'gaia'
-        print('Filename: ', self.ao_filename)  #  DEBUGGING
 
     def analyze(self):
         t = time()
@@ -2576,7 +2507,6 @@ class AO:
                             if new_row[column_names[j]][0] < model_contrast[i]:
                                 recovery_rate[i] = column_rates[j-2]
                                 break
-            t5 = time()  # DEBUGGING
 
             # Make Reject list
             random = np.random.uniform(0, 1, num_generated)
@@ -2587,7 +2517,6 @@ class AO:
         self.pro_sep = pro_sep
         self.low_mass_limit = low_mass_limit
 
-        print('Time Elapsed:', time()-t)  # DEBUGGING
         return np.array(self.reject_list)
 
     def analyze_gaia(self, gaia_limit):
@@ -2827,17 +2756,14 @@ class AO:
                 table_segment = table[n:]
                 age = float(time_segment[time_segment.find('=') + 1:])
                 year_chart = Table.read(table_segment, format='ascii', fast_reader=False)
-                if filter == 'G':
-                    year_chart = year_chart['M/Ms', 'G']
-                    year_chart.rename_column('G', 'Mag')
-                elif filter == 'R':
+                if filter == 'R':
                     year_chart = year_chart['M/Ms', 'R']
                     year_chart.rename_column('R', 'Mag')
                 elif filter == 'I':
                     year_chart = year_chart['M/Ms', 'I']
                     year_chart.rename_column('I', 'Mag')
                 model_chart[age] = year_chart
-        elif filter == 'G':
+        elif filter == 'G' or 'Rp' or 'Bp':
             model_chart = {}
             BHAC_file = 'BHAC15_GAIA.txt'
             with open(BHAC_file, 'r') as content_file:
@@ -2854,12 +2780,12 @@ class AO:
                 if filter == 'G':
                     year_chart = year_chart['M/Ms', 'G']
                     year_chart.rename_column('G', 'Mag')
-                elif filter == 'R':
-                    year_chart = year_chart['M/Ms', 'R']
-                    year_chart.rename_column('R', 'Mag')
-                elif filter == 'I':
-                    year_chart = year_chart['M/Ms', 'I']
-                    year_chart.rename_column('I', 'Mag')
+                elif filter == 'Rp':
+                    year_chart = year_chart['M/Ms', 'G_RP']
+                    year_chart.rename_column('G_RP', 'Mag')
+                elif filter == 'Bp':
+                    year_chart = year_chart['M/Ms', 'G_BP']
+                    year_chart.rename_column('G_BP', 'Mag')
                 model_chart[age] = year_chart
         # Set up interpolation
         ages = np.array(list(model_chart.keys()))
@@ -2983,7 +2909,6 @@ class RV:
         #     For time comparison I want to generate times with the same range as the times in MJD, and then calculate
         #     the predicted RV at that time, which I can then compare to the experimental values using least squares
         num_generated = self.companions.get_num()
-        t = time()
         # Unpack parameters
         period = self.companions.get_P()
         mass_ratio = self.companions.get_mass_ratio()
@@ -3022,6 +2947,7 @@ class RV:
 
             max_delta_rv = np.max(np.absolute(np.subtract(prim_rv, cmp_rv)), axis=1)
 
+
             # Determine the overall predicted RV
             for i in range(num_generated):
                 if contrast[i] > 5:
@@ -3044,12 +2970,10 @@ class RV:
                         np.add(np.square(self.measurement_error), self.added_jitter ** 2))) for i in range(num_generated)]
             # The degrees of freedom is equal to (N-1)+1, for the number of data points and the applied velocity shift
             prob = [stats.chi2.cdf(chi_squared[i], len(self.MJD)) for i in range(0, num_generated)]
-            print('Serial Time: ', time()-t)  # TESTING
 
         else:  # Parallel
             # Determine cpu count
             cpu_count = mp.cpu_count()-1
-            print('Num CPUs to use:', str(cpu_count))  # TESTING
 
             contrast_check = [True if x <= 5 else False for x in contrast]
 
@@ -3117,7 +3041,16 @@ class RV:
         rv_fit_reject = np.array([True if np.random.rand() < x else False for x in prob])
         # Check amplitude and resolution
         above_amplitude = np.array([True if abs(x) > self.rv_floor else False for x in amp])
+        self.amp = amp
         visible_sb2 = np.array([True if contrast[i] < 5 and max_delta_rv[i] > delta_v else False for i in range(num_generated)])
+        self.b_type = ['              ']*num_generated
+        for i in range(num_generated):
+            if contrast[i] > 5:
+                self.b_type[i] = 'SB1'
+            elif contrast[i] <=5 and max_delta_rv[i] < delta_v:
+                self.b_type[i] = 'Unresolved SB2'
+            elif contrast[i] <=5 and max_delta_rv[i] > delta_v:
+                self.b_type[i] = 'Resolved SB2'
 
         self.rv_reject_list = np.array([True if (rv_fit_reject[i] and above_amplitude[i]) or visible_sb2[i] else False for i in range(num_generated)])
         return self.rv_reject_list
@@ -3416,20 +3349,6 @@ class RUWE:
                          else rejection_prob[i] for i in range(self.num_generated)]
         self.rejection = rejection_prob
 
-        # # test plot
-        # plt.figure()
-        # plt.pcolormesh(x_edges, y_edges, z, zorder=0)
-        # pcm = plt.scatter(self.projected_sep, delta_g, c=rejection_prob, edgecolors='white', cmap='RdBu_r')
-        # plt.hlines([-0.1, 7.1], np.min(self.ruwe_dist['Sep(AU)']), np.max(self.ruwe_dist['Sep(AU)']), colors='k')
-        # plt.vlines([np.min(self.ruwe_dist['Sep(AU)']), np.max(self.ruwe_dist['Sep(AU)'])],-0.1, 7.1, colors='k')
-        # plt.colorbar(pcm, label='Rejection Probability')
-        # plt.xscale('log')
-        # plt.xlabel('Sep (AU)')
-        # plt.xlim(1e-1, 1e4)
-        # plt.ylabel('Delta G')
-        # plt.ylim(11, 0.)
-        # plt.savefig('ruwe_test_rejection_probs.pdf', bbox_inches='tight', pad_inches=0.15)
-
         rejection = np.random.rand(self.num_generated)
 
         reject_list = [True if rejection[i] < rejection_prob[i] else False for i in range(self.num_generated)]
@@ -3519,8 +3438,6 @@ class RUWE:
 
         self.ruwe_dist = t
         return
-
-
 
 
 if __name__ == '__main__':
