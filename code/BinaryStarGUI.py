@@ -1,4 +1,4 @@
-# MOLUSC v.20210423
+# MOLUSC v.20210607
 # Mackenna Wood, UNC Chapel Hill
 import numpy as np
 import scipy as scipy
@@ -2969,7 +2969,7 @@ class RV:
             chi_squared = [sum(np.divide(np.square(np.subtract(self.experimental_RV, self.predicted_RV[i])),
                         np.add(np.square(self.measurement_error), self.added_jitter ** 2))) for i in range(num_generated)]
             # The degrees of freedom is equal to (N-1)+1, for the number of data points and the applied velocity shift
-            prob = [stats.chi2.cdf(chi_squared[i], len(self.MJD)) for i in range(0, num_generated)]
+            prob = [stats.chi2.cdf(chi_squared[i], len(self.MJD)-1) for i in range(0, num_generated)]
 
         else:  # Parallel
             # Determine cpu count
@@ -3034,7 +3034,7 @@ class RV:
                 amp = [np.ptp(self.predicted_RV[i]) for i in range(num_generated)]
                 chi_squared = [sum(np.divide(np.square(np.subtract(self.experimental_RV, self.predicted_RV[i])),
                                np.add(np.square(self.measurement_error), self.added_jitter**2))) for i in range(num_generated)]
-                prob = [stats.chi2.cdf(chi_squared[i], len(self.MJD)) for i in range(0, num_generated)]
+                prob = [stats.chi2.cdf(chi_squared[i], len(self.MJD)-1) for i in range(0, num_generated)]
             # End Parallelized
 
         # Reject things with a rejection probability greater than 0.997, corresponding to 3 sigma
