@@ -1,4 +1,4 @@
-# MOLUSC v.20210607
+# MOLUSC v.20210618
 # Mackenna Wood, UNC Chapel Hill
 import numpy as np
 import scipy as scipy
@@ -1548,7 +1548,6 @@ class Application:
 
         # Decide which parts to run, and run them
         #    AO
-        print('ao filename:', self.ao_filename)
         if self.ao_filename[0]:
             ao_reject_lists = []
             for i in range(len(self.ao_filename)):
@@ -1618,7 +1617,7 @@ class Application:
             # Perform Test
             self.ruwe_reject_list = ruwe.analyze()
             if self.extra_output:
-                self.print_out(('The star has ln(ruwe) of %f and a binary probability of %f.' % (ruwe.ln_ruwe, ruwe.binary_prob)))
+                self.print_out(('The star has ln(ruwe) of %f.' % (ruwe.ln_ruwe)))
         else:
             self.ruwe_reject_list = np.array([False]*self.num_generated)
 
@@ -3324,7 +3323,7 @@ class RUWE:
         # f. Get predicted RUWE
         #    convert from mas to AU
         star_distance = star_distance * 2.063e+8 # AU
-        self.ruwe_dist['Sep(AU)'] = [round(star_distance * np.tan(np.radians(x/(3.6e6))), 1) for x in np.power(10, self.ruwe_dist['log(sep)']) ]
+        self.ruwe_dist['Sep(AU)'] = [star_distance * np.tan(np.radians(x/(3.6e6))) for x in np.power(10, self.ruwe_dist['log(sep)']) ]
 
         #  2D interpolation functions for ruwe and sigma_ruwe
         x_edges = np.unique(np.array(self.ruwe_dist['Sep(AU)']))
@@ -3433,7 +3432,7 @@ class RUWE:
             return -51
 
     def read_dist(self):
-        file_name = 'RuweTableGP.txt'
+        file_name = 'RuweTableGP-GITHUB.txt'
         t = Table.read(file_name, format='ascii', delimiter=' ')
 
         self.ruwe_dist = t
