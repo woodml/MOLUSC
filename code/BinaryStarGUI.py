@@ -1874,7 +1874,7 @@ class Application:
             return True
         elif error_code == -43:
             # RUWE Distribution file not found
-            self.print_out("""ERROR: RUWE distribution file not found\nThe file should be named RUWE_fraction_dist.txt 
+            self.print_out("""ERROR: RUWE distribution file not found\nThe file should be named RuweTableGP.txt 
             and located in the folder the code is being run from.""")
             if self.using_gui:
                 self.gui.update_status('Finished - Unsuccessful')
@@ -2677,7 +2677,9 @@ class AO:
         coordinate = SkyCoord(star_RA, star_DEC, frame='icrs')
         width = u.Quantity(10, u.arcsecond)
         height = u.Quantity(10, u.arcsecond)
-        gaia_info = Gaia.query_object(coordinate=coordinate, width=width, height=height, verbose=False)
+        job_str = ("SELECT TOP 10 DISTANCE(POINT('ICRS', %f, %f), POINT('ICRS', ra, dec)) AS dist, * FROM gaiaedr3.gaia_source WHERE 1=CONTAINS(POINT('ICRS', %f, %f),CIRCLE('ICRS', ra, dec, 0.08333333)) ORDER BY dist ASC)" % (coordinate.ra.degree, coordinate.dec.degree, coordinate.ra.degree, coordinate.dec.degree))
+        job = Gaia.launch_job(job_str)
+        gaia_info = job.get_results()
         if gaia_info:
             if len(gaia_info) > 1:
                 # Multiple possible sources. Sort by search distance and take the closest one. Print warning.
