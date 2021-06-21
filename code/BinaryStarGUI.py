@@ -1,4 +1,4 @@
-# MOLUSC v.20210618
+# MOLUSC v.20210620
 # Mackenna Wood, UNC Chapel Hill
 import numpy as np
 import scipy as scipy
@@ -1723,10 +1723,15 @@ class Application:
                     all_table = np.vstack((all_table, ruwe.delta_g, ruwe.predicted_ruwe, self.ruwe_reject_list))
             if self.gaia_check:
                 if 'Model Contrast' in cols:
+					# The AO test has been run, projected sep and contrast already included
+                    cols = cols + ['Gaia Rejected']
+                    all_table = np.vstack((all_table, self.gaia_reject_list))
+                elif 'DeltaG' in cols or 'Projected Separation(AU)'in cols:
+					# RUWE test has been run, projected sep and contrast already included
                     cols = cols + ['Gaia Rejected']
                     all_table = np.vstack((all_table, self.gaia_reject_list))
                 else:
-                    cols = cols + ['Projected Separation(AU)', 'Model Contrast', 'Gaia Rejected']
+                    cols = cols + ['Projected Separation(AU)', 'DeltaG', 'Gaia Rejected']
                     all_table = np.vstack((all_table, gaia.pro_sep, gaia.model_contrast, self.gaia_reject_list))
 
             # Add column containing full rejection info
@@ -2840,7 +2845,6 @@ class AO:
             # Rename columns, assuming they are in the correct format of separation, magnitude
             contrast_table.rename_column(list(contrast_table.columns)[0], 'Sep')
             # Convert separation from mas to AU, order columns correctly
-            print('Star Distance', self.star_distance)
             contrast_table['Sep (AU)'] = [round(self.star_distance * np.tan(np.radians(x/(3.6e6))), 1) for x in contrast_table['Sep']]
             order = ['Sep (AU)'] + list(contrast_table.columns)[1:-1]
             contrast_table = contrast_table[order]
@@ -3434,7 +3438,7 @@ class RUWE:
             return -51
 
     def read_dist(self):
-        file_name = 'RuweTableGP-GITHUB.txt'
+        file_name = 'RuweTableGP.txt'
         t = Table.read(file_name, format='ascii', delimiter=' ')
 
         self.ruwe_dist = t
