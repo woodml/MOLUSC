@@ -24,17 +24,17 @@ Regardless of which interface is used the user will need to provide the followin
 - Number of companions to generate
 - Output file prefix
 
-The following information is optional, depending on which types of analysis are being used.
+The following information is optional, depending on which types of analysis are being used. Examples of RV and High Resolution Imaging text files are provided above.
 
 **Radial Velocity**
-- File containing RV measurements, times and errors
+- File containing RV measurements (in km/s), times (in JD) and errors
 - Spectral resolution of RV measurements
-- Added Jitter
-- RV Sensitivity Floor
+- Added Jitter (in m/s)
+- RV Sensitivity Floor (in m/s)
 
 **High Resolution Imaging**
-- File containing contrast curve
-- Filter in which imaging was taken (2MASS J, H, K, Gaia G, and CFHT R, I are available)
+- File containing contrast curve, with Delta mag and Separation (in mas)
+- Filter in which imaging was taken (2MASS J, H, K, Gaia G, Bp, Rp, and CFHT R, I are available)
 
 **Additional Input**
 There are a number of additional options allowing you to alter the generated distribution of companions. You can choose to limit any of the six orbital parameters, $P$, $q$, $e$, $i$, $\omega$, and $\varphi$, to have fixed, minimum or maximum values. The mean and standard deviation of the log-normal period distribution can be altered, as can the exponent for the power-law mass ratio distribution. Finally, you can choose to use either the more conservative 18th mag or more complete 20th mag completeness limits for Gaia imaging limits.
@@ -48,6 +48,25 @@ The command line interface does not offer the full range of user options. Specif
 - Limit most orbital parameters (it is still possible to limit to only eclipsing companions)
 - Adjust the Period or Mass Ratio distributions
 - Use the 20th magnitude Gaia completeness limit
+
+Optional arguments:
+
+| Argument | Description |
+| --- | ----------- |
+| -h, --help | Show help message and exit |
+| --age AGE[Gyr] | Input the age of the star in Gyr |
+| --jitter JITTER[m/s] | The RV jitter to be added in quadrature \n to the measurement error in m/s |
+| --rv_floor RV FLOOR[m/s] |  The lowest RV semi-amplitude which can be rejected in m/s |
+| --rv RV_PATH | The path to the file containing the RV data |
+| --ao AO_PATH | The path to the file containing the HRI data |
+| --filter {J,K,H,G,R,I} | The filter in which the HRI data was taken |
+| --ruwe | Apply the RUWE test |
+| --gaia | Apply the Gaia contrast test |
+| --transit | Generate only transiting/eclipsing companions |
+| -v, --verbose | Turn on extra output |
+| -a, --all | Write out all generated companions |
+| --- | ----------- |
+                      
 
 ## Results
 Results from MOLUSC are written out into one or two .csv files. The first file, which is always written out, is output_kept.csv. This includes the generated orbital parameters and calculated parameters (such as projected separation) for all simulated companions which were not ruled out by the analysis.
