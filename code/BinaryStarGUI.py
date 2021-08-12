@@ -1716,11 +1716,11 @@ class Application:
                     # all_table = np.vstack((all_table, rv.jitter, np.transpose(np.array(rv.predicted_RV))))
             if self.ruwe_check:
                 if 'Projected Separation(AU)' not in cols:
-                    cols = cols + ['Projected Separation(AU)','DeltaG','Predicted RUWE','RUWE Rejected']
-                    all_table = np.vstack((all_table, ruwe.projected_sep, ruwe.delta_g, ruwe.predicted_ruwe, self.ruwe_reject_list))
+                    cols = cols + ['Projected Separation(AU)','DeltaG','Predicted RUWE','RUWE Rejected','RUWE Rejection Prob']
+                    all_table = np.vstack((all_table, ruwe.projected_sep, ruwe.delta_g, ruwe.predicted_ruwe, self.ruwe_reject_list, ruwe.rejection_prob))
                 else:
-                    cols = cols + ['DeltaG','Predicted RUWE','RUWE Rejected']
-                    all_table = np.vstack((all_table, ruwe.delta_g, ruwe.predicted_ruwe, self.ruwe_reject_list))
+                    cols = cols + ['DeltaG','Predicted RUWE','RUWE Rejected','RUWE Rejection Prob']
+                    all_table = np.vstack((all_table, ruwe.delta_g, ruwe.predicted_ruwe, self.ruwe_reject_list, ruwe.rejection_prob))
             if self.gaia_check:
                 if 'Model Contrast' in cols:
 					# The AO test has been run, projected sep and contrast already included
@@ -1935,14 +1935,16 @@ class Application:
         # Analysis Options
         my_parser.add_argument('--rv', help='The path to the file containing the RV data', required=False,
                                metavar='RV_PATH', default='')
+        my_parser.add_argument('--resolution', help='The spectral resolution of the RV data', required=False,
+							   metavar='RV_PATH', default=50000)
         my_parser.add_argument('--ao', help='The path to the file containing the AO data', required=False,
                                metavar='AO_PATH', default='')
         my_parser.add_argument('--filter', help='The filter in which the AO data was taken', required=False,
-                               choices=['J','K','H','G','R','I'])
+                               choices=['J','K','H','G', 'Bp','Rp','R','I'])
         my_parser.add_argument('--star_jitter', help='The value of stellar jitter to test against in m/s',
                                required=False, metavar='STAR_JITTER[m/s]', type=float, default=-1)
-        my_parser.add_argument('--ruwe', action='store_true', help='Turn on the RUWE test')
-        my_parser.add_argument('--gaia', action='store_true', help='Turn on the GAIA test')
+        my_parser.add_argument('--ruwe', action='store_true', help='Apply the RUWE test')
+        my_parser.add_argument('--gaia', action='store_true', help='Apply the GAIA contrast test')
         # Other options
         my_parser.add_argument('-v','--verbose', action='store_true', help='Turn on extra output')
         my_parser.add_argument('-a', '--all', action='store_true', help='Write out all generated companions')
@@ -1952,6 +1954,7 @@ class Application:
         # Input the inputs
         #  Analysis Options
         self.rv_filename = args.rv
+        self.resolution = float(args.resolution)
         self.ao_filename = [args.ao]
         self.filter = args.filter
         self.ruwe_check = args.ruwe
@@ -3352,7 +3355,7 @@ class RUWE:
         rejection_prob = [0.0 if (not -.1 < delta_g[i] < 7.1) or
                          (not np.min(self.ruwe_dist['Sep(AU)']) < self.projected_sep[i] < np.max(self.ruwe_dist['Sep(AU)']))
                          else rejection_prob[i] for i in range(self.num_generated)]
-        self.rejection = rejection_prob
+        self.rejection_prob = rejection_prob
 
         rejection = np.random.rand(self.num_generated)
 
