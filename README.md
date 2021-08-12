@@ -80,10 +80,22 @@ Several different types of plots to explore the posterior distributions can be m
 ### RV Analysis
 
 GUI:
+<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129258407-cbd4a050-1e49-458c-9af3-36312a1d3188.png">
+
+Command Line:
+
+python BinaryStarGUI.py -v --rv example_rv.txt --resolution 50000 --age 0.015 rv_test 13h50m06.28s -- -40d50m08.9s 100000 1.3
+
+
+### RV Analysis with Added Jitter
+
+GUI:
 <img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129254252-21fa2540-3ebb-47da-95dc-d594335811da.png">
 
 Command Line:
-python BinaryStarGUI.py -v --rv example_rv.txt --resolution 50000 --age 0.015 test 13h50m06.28s -- -40d50m08.9s 100000 1.3
+
+python BinaryStarGUI.py -v --rv example_rv.txt --resolution 50000 --jitter 100 --age 0.015 rv_test 13h50m06.28s -- -40d50m08.9s 100000 1.3
+
 
 ### HRI Analysis
 
@@ -91,5 +103,32 @@ GUI:
 <img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129256901-96d0432e-f09c-4f81-b8e4-ba32b933c4b6.png">
 
 Command Line:
-python BinaryStarGUI.py -v --ao example_contrast.txt --filter K --age 0.015 test 13h50m06.28s -- -40d50m08.9s 100000 1.3
 
+python BinaryStarGUI.py -v --ao example_contrast.txt --filter K --age 0.015 hri_test 13h50m06.28s -- -40d50m08.9s 100000 1.3
+
+### RUWE and Gaia Contrast Analysis
+
+GUI:
+<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129257602-f523dd25-b7bd-47d9-b272-9ea9aa3a6f74.png">
+
+Command Line:
+
+python BinaryStarGUI.py -v --age 0.015 --ruwe --gaia gaia_test 13h50m06.28s -- -40d50m08.9s 100000 1.3
+
+### RV Analysis with Transit Limits
+This shows how to limit to only transiting companions, which can be done for any of the different types of analysis.
+
+GUI: 
+<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129257972-935804c0-8a0c-4b4e-b428-049b200cb5ed.png">
+
+Command Line:
+
+python BinaryStarGUI.py -v --rv example_rv.txt --resolution 50000 --age 0.015 --transit rv_transit_test 13h50m06.28s -- -40d50m08.9s 100000 1.3
+
+### HRI Analysis with multiple Contrast Curves
+
+GUI:
+<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129259555-d8bfa7a2-2b79-407d-b83d-9cf8b4904671.png">
+
+Command Line:
+Multiple Contrast Curves cannot be used via the command line structure. Please use the GUI for this application.
