@@ -40,7 +40,7 @@ The following information is optional, depending on which types of analysis are 
 There are a number of additional options allowing you to alter the generated distribution of companions. You can choose to limit any of the six orbital parameters, $P$, $q$, $e$, $i$, $\omega$, and $\varphi$, to have fixed, minimum or maximum values. The mean and standard deviation of the log-normal period distribution can be altered, as can the exponent for the power-law mass ratio distribution. Finally, you can choose to use either the more conservative 18th mag or more complete 20th mag completeness limits for Gaia imaging limits.
 
 MOLUSC GUI
-<img width="1180" alt="MOLUSC GUI" src="https://user-images.githubusercontent.com/64872115/115775317-bb648300-a380-11eb-9f91-2bf03128681a.png">
+<img width="1135" alt="image" src="https://user-images.githubusercontent.com/64872115/148095592-5c91f800-9d87-4d91-b1bc-9f55d63f8b9b.png">
 
 ### Command Line
 The command line interface does not offer the full range of user options. Specifically, using the command line interface it is **not** possible to:
@@ -80,7 +80,7 @@ Several different types of plots to explore the posterior distributions can be m
 ### RV Analysis
 
 GUI:
-<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129258407-cbd4a050-1e49-458c-9af3-36312a1d3188.png">
+<img width="1135" alt="image" src="https://user-images.githubusercontent.com/64872115/148096054-a5184d0d-f506-4f79-926f-b2f00ee84349.png">
 
 Command Line:
 
@@ -90,7 +90,7 @@ python BinaryStarGUI.py -v --rv example_rv.txt --resolution 50000 --age 0.015 rv
 ### RV Analysis with Added Jitter
 
 GUI:
-<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129254252-21fa2540-3ebb-47da-95dc-d594335811da.png">
+<img width="1135" alt="image" src="https://user-images.githubusercontent.com/64872115/148096114-e0be15f9-0218-435c-b762-9062387d8ebd.png">
 
 Command Line:
 
@@ -100,7 +100,7 @@ python BinaryStarGUI.py -v --rv example_rv.txt --resolution 50000 --jitter 100 -
 ### HRI Analysis
 
 GUI:
-<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129256901-96d0432e-f09c-4f81-b8e4-ba32b933c4b6.png">
+<img width="1116" alt="image" src="https://user-images.githubusercontent.com/64872115/148096865-50ff0215-7cf5-4543-83f8-a0e7cc1d5e43.png">
 
 Command Line:
 
@@ -109,7 +109,7 @@ python BinaryStarGUI.py -v --ao example_contrast.txt --filter K --age 0.015 hri_
 ### RUWE and Gaia Contrast Analysis
 
 GUI:
-<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129257602-f523dd25-b7bd-47d9-b272-9ea9aa3a6f74.png">
+<img width="1135" alt="image" src="https://user-images.githubusercontent.com/64872115/148096349-3ae1c035-93bd-4572-9458-286cab4492bf.png">
 
 Command Line:
 
@@ -119,7 +119,7 @@ python BinaryStarGUI.py -v --age 0.015 --ruwe --gaia gaia_test 13h50m06.28s -- -
 This shows how to limit to only transiting companions, which can be done for any of the different types of analysis.
 
 GUI: 
-<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129257972-935804c0-8a0c-4b4e-b428-049b200cb5ed.png">
+<img width="1135" alt="image" src="https://user-images.githubusercontent.com/64872115/148096493-3fff65b8-4582-464f-a2aa-9c25b123ede7.png">
 
 Command Line:
 
@@ -128,7 +128,7 @@ python BinaryStarGUI.py -v --rv example_rv.txt --resolution 50000 --age 0.015 --
 ### HRI Analysis with multiple Contrast Curves
 
 GUI:
-<img width="1183" alt="image" src="https://user-images.githubusercontent.com/64872115/129259555-d8bfa7a2-2b79-407d-b83d-9cf8b4904671.png">
+<img width="1124" alt="image" src="https://user-images.githubusercontent.com/64872115/148096703-36838584-9715-4b86-8bf5-c7c1f63e8fcf.png">
 
 Command Line:
 Multiple Contrast Curves cannot be used via the command line structure. Please use the GUI for this application.
