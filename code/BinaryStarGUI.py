@@ -141,7 +141,7 @@ class GUI(tk.Frame):
 		self.__rv_file_box = tk.Entry(Analysis_Options, textvariable=self.__rv_file, state=tk.DISABLED, width=25, disabledbackground='#ECECEC', highlightthickness=0, bd=1)
 		# AO filter menu
 		self.__filter_str = tk.StringVar()
-		self.__filter_menu = tk.OptionMenu(self.ao_frame, self.__filter_str, 'Filter', 'J', 'H', 'K', 'G','Bp','Rp', 'R', 'I')
+		self.__filter_menu = tk.OptionMenu(self.ao_frame, self.__filter_str, 'Filter', 'J', 'H', 'K', 'G','Bp','Rp', 'R', 'I', 'L', 'LL', 'M')
 		self.__filter_str.set('Filter')
 		self.__filter_menu.config(state=tk.DISABLED, highlightthickness=0)
 		self.ao_filter_menus.append(self.__filter_str)
@@ -480,7 +480,7 @@ class GUI(tk.Frame):
 		# Create Widgits
 		label = tk.Label(self.ao_frame, text=('Contrast File ' + str(self.ao_rows) +  ':'), bg='#ECECEC')
 		file_box = tk.Entry(self.ao_frame, textvariable=ao_file, width=25, highlightthickness=0, bd=1)
-		filter_menu = tk.OptionMenu(self.ao_frame, filter_str, 'Filter', 'J', 'H', 'K', 'G', 'Bp', 'Rp', 'R', 'I')
+		filter_menu = tk.OptionMenu(self.ao_frame, self.__filter_str, 'Filter', 'J', 'H', 'K', 'G','Bp','Rp', 'R', 'I', 'L', 'LL', 'M')
 		filter_str.set('Filter')
 		# Place Widgets
 		label.grid(column=0, row=self.ao_rows)
@@ -497,7 +497,7 @@ class GUI(tk.Frame):
 		allow_run = True
 		message = 'The following problems were detected:\n'
 
-		if not self.__ao_check.get() and not self.__rv_check.get() and not self.__jitter_check.get() and not self.__ruwe_check.get() and not self.__gaia_check.get():
+		if not self.__ao_check.get() and not self.__rv_check.get() and not self.__ruwe_check.get() and not self.__gaia_check.get():
 			message = message + '- No analysis is selected. Please select at least one type of analysis.\n'
 			allow_run = False
 		# Analysis Options
@@ -1361,7 +1361,7 @@ class GUI(tk.Frame):
 			return ['']
 
 	def get_rv_filename(self):
-		if self.__rv_check.get()==1 or self.__jitter_check.get()==1:
+		if self.__rv_check.get()==1:
 			return self.__rv_file.get()
 		else:
 			return ''
@@ -1889,7 +1889,7 @@ class Application:
 		my_parser.add_argument('--ao', help='The path to the file containing the AO data', required=False,
 							   metavar='AO_PATH', default='')
 		my_parser.add_argument('--filter', help='The filter in which the AO data was taken', required=False,
-							   choices=['J','K','H','G', 'Bp','Rp','R','I'])
+							   choices=['J','K','H','G', 'Bp','Rp','R','I','L','LL','M'])
 		my_parser.add_argument('--ruwe', action='store_true', help='Apply the RUWE test')
 		my_parser.add_argument('--gaia', action='store_true', help='Apply the GAIA contrast test')
 		# Other options
@@ -2671,6 +2671,7 @@ class AO:
 			return -51
 
 	def load_stellar_model(self, filter, star_age):
+		print('LOADING STELLAR MODEL...')
 		# Read in file containing stellar model with the filter needed
 		if filter == 'J' or filter == 'H' or filter == 'K':  # 2MASS filters
 			model_chart = {}
@@ -2686,7 +2687,7 @@ class AO:
 				time_segment = table[0:n]
 				table_segment = table[n:]
 				age = float(time_segment[time_segment.find('=') + 1:])
-				year_chart = Table.read(table_segment, format='ascii', fast_reader=False)
+				year_chart = Table.read(table_segment, format='ascii', fast_reader=False, comment='!')
 				if filter == 'J':
 					year_chart = year_chart['M/Ms', 'Mj']
 					year_chart.rename_column('Mj', 'Mag')
@@ -2710,7 +2711,7 @@ class AO:
 				time_segment = table[0:n]
 				table_segment = table[n:]
 				age = float(time_segment[time_segment.find('=') + 1:])
-				year_chart = Table.read(table_segment, format='ascii', fast_reader=False)
+				year_chart = Table.read(table_segment, format='ascii', fast_reader=False, comment='!')
 				if filter == 'R':
 					year_chart = year_chart['M/Ms', 'R']
 					year_chart.rename_column('R', 'Mag')
@@ -2718,7 +2719,7 @@ class AO:
 					year_chart = year_chart['M/Ms', 'I']
 					year_chart.rename_column('I', 'Mag')
 				model_chart[age] = year_chart
-		elif filter == 'G' or 'Rp' or 'Bp':
+		elif filter == 'G' or filter == 'Rp' or filter ==  'Bp':
 			model_chart = {}
 			BHAC_file = 'BHAC15_GAIA.txt'
 			with open(BHAC_file, 'r') as content_file:
@@ -2731,7 +2732,7 @@ class AO:
 				time_segment = table[0:n]
 				table_segment = table[n:]
 				age = float(time_segment[time_segment.find('=') + 1:])
-				year_chart = Table.read(table_segment, format='ascii', fast_reader=False)
+				year_chart = Table.read(table_segment, format='ascii', fast_reader=False, comment='!')
 				if filter == 'G':
 					year_chart = year_chart['M/Ms', 'G']
 					year_chart.rename_column('G', 'Mag')
@@ -2742,9 +2743,38 @@ class AO:
 					year_chart = year_chart['M/Ms', 'G_BP']
 					year_chart.rename_column('G_BP', 'Mag')
 				model_chart[age] = year_chart
+		elif filter == 'L' or filter == 'LL' or filter == 'M':
+			print('MODEL:  CIT2')
+			model_chart = {}
+			BHAC_file = 'BHAC15_CIT2.txt'
+			with open(BHAC_file, 'r') as content_file:
+				content = content_file.read()
+			content = content[content.find('\n\n\n'):]  # Cut off the intro material
+			tables = content.split(
+				sep='\n!-----------------------------------------------------------------------------------------------\n\n')
+			tables = [x for x in tables if len(x) > 1]
+			for table in tables:
+				n1 = table.find('t (Gyr)')
+				n2 = table.find('M')
+				time_segment = table[n1:table[n1:].find('!') + n1]
+				table_segment = table[n2:]
+
+				age = float(time_segment[time_segment.find('=') + 1:])
+				year_chart = Table.read(table_segment, format='ascii', fast_reader=False, comment='!')
+
+				if filter == 'L':
+					year_chart = year_chart['M/Ms', 'Ml']
+					year_chart.rename_column('Ml', 'Mag')
+				elif filter == 'LL':
+					year_chart = year_chart['M/Ms', 'Mll']
+					year_chart.rename_column('Mll', 'Mag')
+				elif filter == 'M':
+					year_chart = year_chart['M/Ms', 'Mm']
+					year_chart.rename_column('Mm', 'Mag')
+				model_chart[age] = year_chart
 		# Set up interpolation
 		ages = np.array(list(model_chart.keys()))
-		#  check if age is modeled
+		#  check if age is modeled, if it is simply take that chart, if not interpolate within the model to get it
 		if star_age in ages:
 			return model_chart[star_age]
 		#  find ages above and below the desired age
