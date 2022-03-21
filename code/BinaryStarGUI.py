@@ -1,4 +1,4 @@
-# MOLUSC v.20210620
+# MOLUSC v.20220321
 # Mackenna Wood, UNC Chapel Hill
 import numpy as np
 import scipy as scipy
@@ -1652,18 +1652,11 @@ class Application:
 				all_table = np.vstack((all_table, ao.pro_sep, ao.model_contrast, ao_reject_lists))
 			if self.rv_filename:
 				# Write out RV calculations
-				if self.star_jitter == -1:  # RV only, no jitter
-					cols = cols + ['RV Amplitude','Binary Type','RV Rejected']
-					all_table = np.vstack((all_table, rv.amp, rv.b_type, self.rv_reject_list))
-					# Uncomment to  include RV Calcualations in output file (makes it obnoxiously large)
-					# cols = cols + ['rv' + str(i) for i in range(0, len(rv.MJD))]
-					# all_table = np.vstack((all_table, np.transpose(np.array(rv.predicted_RV))))
-				else:  # RV and jitter
-					cols = cols +['Jitter Rejected']
-					all_table = np.vstack((all_table, self.jitter_reject_list))
-					# Uncomment to  include RV Calcualations in output file (makes it obnoxiously large)
-					# cols = cols + ['jitter'] + ['rv' + str(i) for i in range(0, len(rv.MJD))]
-					# all_table = np.vstack((all_table, rv.jitter, np.transpose(np.array(rv.predicted_RV))))
+				cols = cols + ['RV Amplitude','Binary Type','RV Rejected']
+				all_table = np.vstack((all_table, rv.amp, rv.b_type, self.rv_reject_list))
+				# Uncomment to  include RV Calcualations in output file (makes it obnoxiously large)
+				# cols = cols + ['rv' + str(i) for i in range(0, len(rv.MJD))]
+				# all_table = np.vstack((all_table, np.transpose(np.array(rv.predicted_RV))))
 			if self.ruwe_check:
 				if 'Projected Separation(AU)' not in cols:
 					cols = cols + ['Projected Separation(AU)','DeltaG','Predicted RUWE','RUWE Rejected','RUWE Rejection Prob']
@@ -1954,7 +1947,6 @@ class Application:
 		self.ruwe_check = False
 		self.gaia_check = False
 		# Star parameters
-		self.star_jitter = -1
 		self.star_ra = '00h00m00.00s'
 		self.star_dec = '00d00m00.0s'
 		self.star_mass = 0
@@ -2861,31 +2853,16 @@ class RV:
 	jitter = []
 
 	# class functions
-	def __init__(self, filename, resolution, companions, mass, age, star_jitter=0, added_jitter=0, rv_floor=20, extra_output=True):
+	def __init__(self, filename, resolution, companions, mass, age, added_jitter=0, rv_floor=20, extra_output=True):
 		self.restore_defaults()
 		self.rv_filename = filename
 		self.resolution = resolution
 		self.companions = companions
 		self.star_mass = mass
-		self.star_jitter = star_jitter/1000  # convert to km/s
 		self.added_jitter = added_jitter/1000  # convert to km/s
 		self.rv_floor = rv_floor/1000  # km/s
 		self.extra_output = extra_output
 		self.model = self.load_stellar_model('G', age)
-
-	def analyze_jitter(self):
-		print('Analyzing Jitter')
-		num_generated = self.companions.get_num()
-		# Pre-allocate
-		self.jitter = [0.]*num_generated
-		for i in range(num_generated):
-			self.jitter[i] = self.calculate_jitter(self.predicted_RV[i], self.experimental_RV, self.measurement_error)
-
-		# Jitter Accept/Reject
-		self.jitter = np.array(self.jitter)
-		self.jitter_reject_list = [True if x > self.star_jitter else False for x in self.jitter]
-
-		return self.jitter_reject_list
 
 	def analyze_rv(self):
 		# Calculate predicted RV
@@ -2906,6 +2883,7 @@ class RV:
 		delta_v = 2.998e5 / self.resolution  # m/s
 
 		t = time()
+
 		# Determine contrast
 		cmp_mass = np.multiply(self.star_mass, mass_ratio)  # companion mass in solar masses
 
@@ -2930,7 +2908,6 @@ class RV:
 			cmp_rv = np.multiply(-1, cmp_rv)
 
 			max_delta_rv = np.max(np.absolute(np.subtract(prim_rv, cmp_rv)), axis=1)
-
 
 			# Determine the overall predicted RV
 			for i in range(num_generated):
