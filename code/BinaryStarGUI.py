@@ -323,39 +323,22 @@ class GUI(tk.Frame):
 		mass_exp_label = tk.Label(dist_frame, text='Mass Ratio Distribution', justify='center', bg='#ECECEC')
 		exp_label = tk.Label(dist_frame, text=u'\u03B3:', bg='#ECECEC')
 		#  Validation Command registration
-		vcmd_p = (self.root.register(self.validate_P), '%P', '%W')
-		vcmd_i = (self.root.register(self.validate_i), '%P', '%W')
-		vcmd_e = (self.root.register(self.validate_e), '%P', '%W')
-		vcmd_w = (self.root.register(self.validate_arg_peri), '%P', '%W')
-		vcmd_m = (self.root.register(self.validate_m), '%P', '%W')
-		vcmd_a = (self.root.register(self.validate_a), '%P', '%W')
-		vcmd_phi = (self.root.register(self.validate_phi), '%P', '%W')
+		vcmdnames =  ('P', 'i', 'e', 'w', 'm', 'a', 'phi')
+		validate_names = ('P', 'i', 'e', 'arg_peri', 'm', 'a', 'phi')
+		vcmdlist = {}
+		for letter, val in zip(vcmdnames, validate_names):
+			vcmdlist[letter] = (self.root.register(getattr(self, f'validate_{val}')), '%P', '%W')
+
 		vcmd_pd_mu = (self.root.register(self.validate_pd_mu), '%P')
 		vcmd_pd_sig = (self.root.register(self.validate_pd_sig), '%P')
 		vcmd_mass_exp = (self.root.register(self.validate_mass_exp), '%P')
 		#  Grid Entries
 		entry_width = 7
-		self.P1_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_p, highlightthickness=0, bd=1)
-		self.P2_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_p, highlightthickness=0, bd=1)
-		self.P3_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_p, highlightthickness=0, bd=1)
-		self.i1_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_i, highlightthickness=0, bd=1)
-		self.i2_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_i, highlightthickness=0, bd=1)
-		self.i3_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_i, highlightthickness=0, bd=1)
-		self.e1_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_e, highlightthickness=0, bd=1)
-		self.e2_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_e, highlightthickness=0, bd=1)
-		self.e3_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_e, highlightthickness=0, bd=1)
-		self.w1_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_w, highlightthickness=0, bd=1)
-		self.w2_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_w, highlightthickness=0, bd=1)
-		self.w3_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_w, highlightthickness=0, bd=1)
-		self.m1_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_m, highlightthickness=0, bd=1)
-		self.m2_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_m, highlightthickness=0, bd=1)
-		self.m3_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_m, highlightthickness=0, bd=1)
-		self.a1_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_a, highlightthickness=0, bd=1)
-		self.a2_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_a, highlightthickness=0, bd=1)
-		self.a3_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_a, highlightthickness=0, bd=1)
-		self.phi1_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_phi, highlightthickness=0, bd=1)
-		self.phi2_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_phi, highlightthickness=0, bd=1)
-		self.phi3_box = tk.Entry(grid_frame, width=entry_width, validate='focusout', vcmd=vcmd_phi, highlightthickness=0, bd=1)
+		for letter in vcmdnames:
+			for i in range(1, 4):
+				setattr(self, f'{letter}{i}_box',
+                        tk.Entry(grid_frame, width=entry_width, validate='focusout',
+                                 vcmd=vcmdlist[letter], highlightthickness=0, bd=1))
 		# Distribution Entries
 		self.PD_mu_box = tk.Entry(dist_frame, width=entry_width, validate='focusout', vcmd=vcmd_pd_mu, highlightthickness=0, bd=1)
 		self.PD_mu_box.insert(-1, '5.03')
@@ -393,27 +376,9 @@ class GUI(tk.Frame):
 		mass_ratio_label.grid(column=0, row=6)
 		a_label.grid(column=0, row=7)
 		phase_label.grid(column=0, row=8)
-		self.P1_box.grid(column=2, row=2)
-		self.P2_box.grid(column=3, row=2)
-		self.P3_box.grid(column=4, row=2)
-		self.i1_box.grid(column=2, row=3)
-		self.i2_box.grid(column=3, row=3)
-		self.i3_box.grid(column=4, row=3)
-		self.e1_box.grid(column=2, row=4)
-		self.e2_box.grid(column=3, row=4)
-		self.e3_box.grid(column=4, row=4)
-		self.w1_box.grid(column=2, row=5)
-		self.w2_box.grid(column=3, row=5)
-		self.w3_box.grid(column=4, row=5)
-		self.m1_box.grid(column=2, row=6)
-		self.m2_box.grid(column=3, row=6)
-		self.m3_box.grid(column=4, row=6)
-		self.a1_box.grid(column=2, row=7)
-		self.a2_box.grid(column=3, row=7)
-		self.a3_box.grid(column=4, row=7)
-		self.phi1_box.grid(column=2, row=8)
-		self.phi2_box.grid(column=3, row=8)
-		self.phi3_box.grid(column=4, row=8)
+		for i, letter in enumerate(vcmdnames):
+			for j in range(1, 4):
+				getattr(self, f'{letter}{j}_box').grid(column=j+1, row=i+2)
 		# distribution
 		period_dist_label.grid(column=0, row=0)
 		mass_exp_label.grid(column=0, row=1)
